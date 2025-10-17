@@ -36,35 +36,37 @@ export const JobPostingCard = ({
 
   return (
     <Card 
-      className="p-4 hover:shadow-lg transition-all duration-300 cursor-pointer border-2 border-primary/20 hover:border-primary/40 bg-gradient-to-br from-background to-primary/5"
+      className="p-4 hover:shadow-xl transition-all duration-300 cursor-pointer border-2 bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
       onClick={handleClick}
     >
       <div className="space-y-3">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <h4 className="text-lg font-bold text-foreground">{brandName}</h4>
-            <p className="text-sm text-primary font-medium">{category}</p>
+            <h4 className="text-lg font-bold text-white">{brandName}</h4>
+            <p className="text-sm text-purple-100 font-medium">{category}</p>
           </div>
-          <ExternalLink className="w-5 h-5 text-primary flex-shrink-0" />
+          <ExternalLink className="w-5 h-5 text-white flex-shrink-0" />
         </div>
 
-        <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>
+        {description && (
+          <p className="text-sm text-purple-50 line-clamp-2">{description}</p>
+        )}
 
         <div className="flex flex-wrap gap-2 text-xs">
-          <div className="flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-full">
-            <DollarSign className="w-3 h-3 text-primary" />
-            <span className="font-semibold text-primary">{compensation}</span>
+          <div className="flex items-center gap-1 bg-white/20 px-2 py-1 rounded-full">
+            <DollarSign className="w-3 h-3 text-white" />
+            <span className="font-semibold text-white">{compensation}</span>
           </div>
           
           {targetAge && (
-            <div className="flex items-center gap-1 bg-secondary px-2 py-1 rounded-full">
+            <div className="flex items-center gap-1 bg-white/20 px-2 py-1 rounded-full text-white">
               <Target className="w-3 h-3" />
               <span>{targetAge}</span>
             </div>
           )}
           
           {targetGender && (
-            <div className="flex items-center gap-1 bg-secondary px-2 py-1 rounded-full">
+            <div className="flex items-center gap-1 bg-white/20 px-2 py-1 rounded-full text-white">
               <Users className="w-3 h-3" />
               <span>{targetGender}</span>
             </div>
@@ -72,9 +74,9 @@ export const JobPostingCard = ({
         </div>
 
         <Button 
-          variant="gradient" 
+          variant="secondary" 
           size="sm" 
-          className="w-full"
+          className="w-full bg-white text-purple-600 hover:bg-purple-50"
           onClick={(e) => {
             e.stopPropagation();
             handleClick();

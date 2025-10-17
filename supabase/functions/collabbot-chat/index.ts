@@ -122,13 +122,23 @@ serve(async (req) => {
    - Campaign Brief: ${post.campaign_brief}${matchInfo}
    - Post ID: ${post.id}
    - View Link: https://3973aeea-a86d-4604-afb3-4a69ac05edd9.lovableproject.com/discover`;
-         }).join('\n\n')}\n\n**COMMUNICATION STYLE**: 
-- Be CONCISE and direct
-- When asked about opportunities, list relevant matches with links immediately
+         }).join('\n\n')}\n\n**COMMUNICATION STYLE & FORMATTING**: 
+- Be CONCISE and direct - keep responses to 1-2 sentences
 - DO NOT ask for profile information - you already have it
-- Keep explanations brief (1-2 sentences max)
-- Format: Brand name, compensation, link - that's it
-- Example response: "Found 2 matches: 1) Levi's Fashion - $400-500 [View](link) 2) Nike Sports - $600 [View](link)"`
+- When listing opportunities, use this EXACT format for each posting (this will be parsed into clickable cards):
+  
+  [JOB_CARD]
+  Brand: [Brand Name]
+  Category: [Category]
+  Compensation: [Amount]
+  Description: [Brief description]
+  TargetAge: [Age Range]
+  TargetGender: [Gender]
+  Link: [URL]
+  [/JOB_CARD]
+
+- Do NOT show links in plain text - they will be rendered as clickable cards
+- Example response: "Found 2 Levi's opportunities for you: [JOB_CARD]...[/JOB_CARD]"`
       : "\n\nCurrently, there are no active brand collaboration opportunities available. Check back soon!";
 
     const systemPrompt = `You are CollabBot, an AI manager for content creators on VibeLink. Your role is to help creators discover paid collaboration opportunities and manage their partnerships efficiently.${profileContext}${postsContext}

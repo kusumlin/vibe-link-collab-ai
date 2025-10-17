@@ -47,22 +47,38 @@ export const CollabBotChat = () => {
 
   const parseJobPostings = (content: string) => {
     const jobPostings = [];
-    const regex = /\*\*(.+?)\*\*\s*-\s*(.+?)\n[\s\S]*?Compensation:\s*(.+?)\n[\s\S]*?Target Age:\s*(.+?)\n[\s\S]*?Target Gender:\s*(.+?)\n[\s\S]*?View Link:\s*(.+?)(?:\n|$)/g;
+    const regex = /\[JOB_CARD\]([\s\S]*?)\[\/JOB_CARD\]/g;
     
     let match;
     while ((match = regex.exec(content)) !== null) {
-      jobPostings.push({
-        brandName: match[1].trim(),
-        category: match[2].trim(),
-        description: content.substring(match.index, match.index + 150).replace(/\*\*/g, '').split('\n')[1]?.trim() || '',
-        compensation: match[3].trim(),
-        targetAge: match[4].trim(),
-        targetGender: match[5].trim(),
-        link: match[6].trim()
-      });
+      const cardContent = match[1];
+      const brandMatch = cardContent.match(/Brand:\s*(.+)/);
+      const categoryMatch = cardContent.match(/Category:\s*(.+)/);
+      const compensationMatch = cardContent.match(/Compensation:\s*(.+)/);
+      const descriptionMatch = cardContent.match(/Description:\s*(.+)/);
+      const ageMatch = cardContent.match(/TargetAge:\s*(.+)/);
+      const genderMatch = cardContent.match(/TargetGender:\s*(.+)/);
+      const linkMatch = cardContent.match(/Link:\s*(.+)/);
+      
+      if (brandMatch && compensationMatch) {
+        jobPostings.push({
+          brandName: brandMatch[1].trim(),
+          category: categoryMatch?.[1].trim() || '',
+          description: descriptionMatch?.[1].trim() || '',
+          compensation: compensationMatch[1].trim(),
+          targetAge: ageMatch?.[1].trim(),
+          targetGender: genderMatch?.[1].trim(),
+          link: linkMatch?.[1].trim()
+        });
+      }
     }
     
     return jobPostings;
+  };
+
+  const cleanMessageContent = (content: string) => {
+    // Remove JOB_CARD blocks from display
+    return content.replace(/\[JOB_CARD\][\s\S]*?\[\/JOB_CARD\]/g, '').trim();
   };
 
   const streamChat = async (userMessages: Message[]) => {
@@ -217,20 +233,22 @@ export const CollabBotChat = () => {
               )}
               
               <div className={`max-w-[80%] space-y-3 ${message.role === 'user' ? 'ml-auto' : ''}`}>
-                <div
-                  className={`
-                    px-4 py-3 rounded-2xl
-                    ${message.role === 'user' 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'bg-muted text-foreground'
-                    }
-                  `}
-                >
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
-                  <span className="text-xs opacity-70 mt-1 block">
-                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </div>
+                {cleanMessageContent(message.content) && (
+                  <div
+                    className={`
+                      px-4 py-3 rounded-2xl
+                      ${message.role === 'user' 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'bg-muted text-foreground'
+                      }
+                    `}
+                  >
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{cleanMessageContent(message.content)}</p>
+                    <span className="text-xs opacity-70 mt-1 block">
+                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                )}
                 
                 {message.role === 'assistant' && message.jobPostings && message.jobPostings.length > 0 && (
                   <div className="space-y-2">
