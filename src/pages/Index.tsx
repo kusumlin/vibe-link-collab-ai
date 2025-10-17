@@ -82,7 +82,7 @@ const Index = () => {
               Discover Brands
             </Button>
             {isLoggedIn && (
-              <Button variant="default" onClick={handleDashboardClick}>
+              <Button variant="gradient" onClick={handleDashboardClick}>
                 <LayoutDashboard className="w-4 h-4 mr-2" />
                 Dashboard
               </Button>
