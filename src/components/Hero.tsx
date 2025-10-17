@@ -43,9 +43,7 @@ export const Hero = () => {
               Get Started Free
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button variant="outline" size="xl" onClick={() => setShowDemo(true)}>
-              Watch Demo
-            </Button>
+            
           </div>
 
           <DemoVideo open={showDemo} onOpenChange={setShowDemo} />
