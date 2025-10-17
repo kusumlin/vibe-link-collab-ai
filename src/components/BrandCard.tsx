@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, X, DollarSign, Users, TrendingUp } from "lucide-react";
+import { Heart, X, DollarSign, Users, TrendingUp, Sparkles } from "lucide-react";
 import { useState } from "react";
 
 interface BrandCardProps {
@@ -13,6 +13,7 @@ interface BrandCardProps {
     audience: string;
     matchScore: number;
     imageUrl?: string;
+    isRecommended?: boolean;
   };
   onSwipe: (brandId: string, liked: boolean) => void;
 }
@@ -44,6 +45,14 @@ export const BrandCard = ({ brand, onSwipe }: BrandCardProps) => {
       
       {/* Content */}
       <div className="relative h-full flex flex-col justify-end p-8 text-white">
+        {/* Recommended Badge */}
+        {brand.isRecommended && (
+          <div className="absolute top-6 left-6 flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 backdrop-blur-sm border border-white/30 shadow-lg animate-pulse">
+            <Sparkles className="w-4 h-4" />
+            <span className="font-bold text-sm">Recommended for You</span>
+          </div>
+        )}
+        
         {/* Match Score Badge */}
         <div className="absolute top-6 right-6 flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm border border-white/30">
           <TrendingUp className="w-4 h-4" />

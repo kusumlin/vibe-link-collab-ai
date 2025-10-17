@@ -5,6 +5,7 @@ import { ArrowLeft, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { calculateMatchScore } from "@/utils/matchingAlgorithm";
 
 const Discover = () => {
   const navigate = useNavigate();
@@ -15,6 +16,20 @@ const Discover = () => {
   useEffect(() => {
     const fetchBrands = async () => {
       try {
+        // Fetch creator profile for matching
+        const { data: { user } } = await supabase.auth.getUser();
+        let creatorProfile = null;
+
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('skills, age, gender, postal_code, content_style')
+            .eq('id', user.id)
+            .maybeSingle();
+          
+          creatorProfile = profile;
+        }
+
         const { data, error } = await supabase
           .from('collaboration_posts')
           .select('*')
@@ -23,18 +38,40 @@ const Discover = () => {
         if (error) throw error;
 
         // Map database fields to BrandCard format
-        const mappedBrands = data?.map((post) => ({
-          id: post.id,
-          name: post.brand_name,
-          category: post.category,
-          description: post.description,
-          budget: post.compensation,
-          audience: `${post.target_age_range}, ${post.target_gender}`,
-          matchScore: Math.floor(Math.random() * 15) + 85, // Random score 85-99
-          imageUrl: post.image_url,
-        })) || [];
+        const mappedBrands = data?.map((post) => {
+          let matchScore = Math.floor(Math.random() * 15) + 85; // Default random score
+          let isRecommended = false;
 
-        setBrands(mappedBrands);
+          // Calculate real match score if user is logged in
+          if (creatorProfile) {
+            const { score } = calculateMatchScore(creatorProfile, post);
+            if (score >= 50) {
+              matchScore = score;
+              isRecommended = true;
+            }
+          }
+
+          return {
+            id: post.id,
+            name: post.brand_name,
+            category: post.category,
+            description: post.description,
+            budget: post.compensation,
+            audience: `${post.target_age_range}, ${post.target_gender}`,
+            matchScore,
+            imageUrl: post.image_url,
+            isRecommended,
+          };
+        }) || [];
+
+        // Sort so recommended ones appear first
+        const sortedBrands = mappedBrands.sort((a, b) => {
+          if (a.isRecommended && !b.isRecommended) return -1;
+          if (!a.isRecommended && b.isRecommended) return 1;
+          return b.matchScore - a.matchScore;
+        });
+
+        setBrands(sortedBrands);
       } catch (error) {
         console.error('Error fetching brands:', error);
         toast.error("Failed to load brand postings");

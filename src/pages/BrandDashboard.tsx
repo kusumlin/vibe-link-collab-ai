@@ -6,6 +6,8 @@ import { Sparkles, Briefcase, Plus, TrendingUp, Users, Eye } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { LogoutButton } from "@/components/LogoutButton";
+import { getMatchedCreators } from "@/utils/matchingAlgorithm";
+import { SuggestedCreators } from "@/components/SuggestedCreators";
 
 interface CollaborationPost {
   id: string;
@@ -14,6 +16,10 @@ interface CollaborationPost {
   description: string;
   compensation: string;
   target_audience: string;
+  target_age_range: string;
+  target_gender: string;
+  campaign_brief: string;
+  image_url: string | null;
   created_at: string;
   applicant_count?: number;
   views?: number;
@@ -27,6 +33,7 @@ export default function BrandDashboard() {
   const [totalApplicants, setTotalApplicants] = useState(0);
   const [totalViews, setTotalViews] = useState(0);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [suggestedCreators, setSuggestedCreators] = useState<any[]>([]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -79,7 +86,7 @@ export default function BrandDashboard() {
       if (error) throw error;
 
       // Fetch applicant counts for each post
-      if (data) {
+      if (data && data.length > 0) {
         const postsWithCounts = await Promise.all(
           data.map(async (post) => {
             const { count } = await supabase
@@ -103,6 +110,11 @@ export default function BrandDashboard() {
         // Calculate total views
         const views = postsWithCounts.reduce((sum, post) => sum + (post.views || 0), 0);
         setTotalViews(views);
+
+        // Fetch suggested creators for the first/most recent post
+        if (postsWithCounts.length > 0) {
+          await fetchSuggestedCreators(postsWithCounts[0]);
+        }
       }
     } catch (error: any) {
       toast({
@@ -112,6 +124,39 @@ export default function BrandDashboard() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchSuggestedCreators = async (post: CollaborationPost) => {
+    try {
+      // Fetch all creator profiles
+      const { data: profiles, error } = await supabase
+        .from("profiles")
+        .select("id, email, skills, age, gender, postal_code, content_style, user_type")
+        .eq("user_type", "creator");
+
+      if (error) throw error;
+
+      if (profiles && profiles.length > 0) {
+        // Format for matching algorithm
+        const creatorsData = profiles.map(p => ({
+          id: p.id,
+          email: p.email || "No email",
+          profile: {
+            skills: p.skills,
+            age: p.age,
+            gender: p.gender,
+            postal_code: p.postal_code,
+            content_style: p.content_style,
+          }
+        }));
+
+        // Get matched creators
+        const matched = getMatchedCreators(post, creatorsData, 30, 10);
+        setSuggestedCreators(matched);
+      }
+    } catch (error) {
+      console.error("Error fetching suggested creators:", error);
     }
   };
 
@@ -214,6 +259,12 @@ export default function BrandDashboard() {
             </div>
           )}
         </Card>
+
+        {/* Suggested Creators Section */}
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-6">Suggested Creators by CollabBot</h2>
+          <SuggestedCreators creators={suggestedCreators} brandName={posts[0]?.brand_name || "your brand"} />
+        </div>
       </div>
     </div>
   );

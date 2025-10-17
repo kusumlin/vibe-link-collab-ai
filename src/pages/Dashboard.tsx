@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { LogoutButton } from "@/components/LogoutButton";
+import { getMatchedCollaborations } from "@/utils/matchingAlgorithm";
 
 interface CollaborationPost {
   id: string;
@@ -19,6 +20,7 @@ interface CollaborationPost {
   campaign_brief: string;
   image_url: string | null;
   matchScore?: number;
+  matchReasons?: string[];
 }
 
 interface CreatorProfile {
@@ -28,48 +30,6 @@ interface CreatorProfile {
   postal_code: string | null;
   content_style: string | null;
 }
-
-const calculateMatchScore = (
-  profile: CreatorProfile,
-  post: CollaborationPost
-): number => {
-  let score = 0;
-
-  // Age matching (40 points)
-  if (profile.age && post.target_age_range) {
-    const ageRanges: { [key: string]: [number, number] } = {
-      "18-24": [18, 24],
-      "25-34": [25, 34],
-      "35-44": [35, 44],
-      "45+": [45, 100],
-    };
-    const range = ageRanges[post.target_age_range];
-    if (range && profile.age >= range[0] && profile.age <= range[1]) {
-      score += 40;
-    }
-  }
-
-  // Gender matching (30 points)
-  if (profile.gender && post.target_gender) {
-    if (
-      post.target_gender.toLowerCase() === "any" ||
-      profile.gender.toLowerCase() === post.target_gender.toLowerCase()
-    ) {
-      score += 30;
-    }
-  }
-
-  // Skills/Category matching (30 points)
-  if (profile.skills && post.category) {
-    const skills = profile.skills.toLowerCase();
-    const category = post.category.toLowerCase();
-    if (skills.includes(category) || category.includes(skills)) {
-      score += 30;
-    }
-  }
-
-  return score;
-};
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -163,17 +123,9 @@ export default function Dashboard() {
 
       if (postsError) throw postsError;
 
-      // Calculate match scores and sort
-      const scoredPosts = posts
-        .map((post) => ({
-          ...post,
-          matchScore: calculateMatchScore(profile, post),
-        }))
-        .filter((post) => post.matchScore > 0)
-        .sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0))
-        .slice(0, 6);
-
-      setMatchedPosts(scoredPosts);
+      // Use the enhanced matching algorithm
+      const matchedPosts = getMatchedCollaborations(profile, posts || [], 30, 6);
+      setMatchedPosts(matchedPosts);
     } catch (error) {
       console.error("Error fetching matched collaborations:", error);
       toast({
@@ -238,9 +190,9 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        <div className="space-y-6">
+          <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold">Matched Collaborations for You</h2>
+            <h2 className="text-2xl font-bold">Recommended Collaborations by CollabBot</h2>
             <Button variant="outline" onClick={() => navigate("/discover")}>
               View All
             </Button>
