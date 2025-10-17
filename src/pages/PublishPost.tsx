@@ -18,7 +18,7 @@ export default function PublishPost() {
       title: "Post Published!",
       description: "Your collaboration opportunity has been posted successfully.",
     });
-    navigate("/");
+    navigate("/dashboard");
   };
 
   return (
@@ -40,7 +40,25 @@ export default function PublishPost() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="postDescription">Post Description</Label>
+            <Label htmlFor="brandName">Brand Name</Label>
+            <Input 
+              id="brandName" 
+              placeholder="Your brand or company name"
+              required 
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="category">Category</Label>
+            <Input 
+              id="category" 
+              placeholder="e.g., Fashion, Tech, Beauty, Lifestyle"
+              required 
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="postDescription">Description</Label>
             <Textarea 
               id="postDescription" 
               placeholder="Describe your collaboration opportunity, what you're looking for, and what you offer"
@@ -50,7 +68,25 @@ export default function PublishPost() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="age">Target Age</Label>
+            <Label htmlFor="compensation">Pay / Compensation</Label>
+            <Input 
+              id="compensation" 
+              placeholder="e.g., $500-$1000, Product exchange, Commission-based"
+              required 
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="targetAudience">Target Audience</Label>
+            <Input 
+              id="targetAudience" 
+              placeholder="e.g., 18-35 year olds, Female, Urban"
+              required 
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="age">Target Age Range</Label>
             <Input 
               id="age" 
               placeholder="e.g., 18-35" 
@@ -71,14 +107,23 @@ export default function PublishPost() {
             <Label htmlFor="campaignBrief">Campaign Brief</Label>
             <Textarea 
               id="campaignBrief" 
-              placeholder="Provide details about the campaign goals, deliverables, timeline, and compensation"
+              placeholder="Provide details about the campaign goals, deliverables, timeline, and requirements"
               required 
               rows={4}
             />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="imageUrl">Brand Image URL (Optional)</Label>
+            <Input 
+              id="imageUrl" 
+              type="url"
+              placeholder="https://example.com/brand-logo.jpg"
+            />
+          </div>
+
           <Button type="submit" variant="gradient" className="w-full" size="lg">
-            Publish Post
+            Publish Collaboration
           </Button>
 
           <div className="text-center">
