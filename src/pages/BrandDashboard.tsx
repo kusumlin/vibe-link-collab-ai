@@ -1,10 +1,59 @@
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { Sparkles, Briefcase, Plus, TrendingUp, Users, Eye } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+
+interface CollaborationPost {
+  id: string;
+  brand_name: string;
+  category: string;
+  description: string;
+  compensation: string;
+  target_audience: string;
+  created_at: string;
+}
 
 export default function BrandDashboard() {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [posts, setPosts] = useState<CollaborationPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        navigate("/auth");
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("collaboration_posts")
+        .select("*")
+        .eq("brand_user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      setPosts(data || []);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to load posts",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-primary/5">
@@ -34,7 +83,7 @@ export default function BrandDashboard() {
               <Briefcase className="w-6 h-6 text-white" />
             </div>
             <h3 className="text-xl font-semibold">Active Posts</h3>
-            <p className="text-3xl font-bold">0</p>
+            <p className="text-3xl font-bold">{posts.length}</p>
           </Card>
 
           <Card className="p-6 space-y-4">
@@ -63,15 +112,42 @@ export default function BrandDashboard() {
             </Button>
           </div>
           
-          <div className="text-center py-12 text-muted-foreground">
-            <Briefcase className="w-16 h-16 mx-auto mb-4 opacity-50" />
-            <p className="text-lg mb-4">No collaboration posts yet</p>
-            <p className="text-sm mb-6">Create your first post to start connecting with creators</p>
-            <Button variant="gradient" onClick={() => navigate("/publish-post")}>
-              <Plus className="w-4 h-4 mr-2" />
-              Create Your First Post
-            </Button>
-          </div>
+          {isLoading ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <p>Loading posts...</p>
+            </div>
+          ) : posts.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <Briefcase className="w-16 h-16 mx-auto mb-4 opacity-50" />
+              <p className="text-lg mb-4">No collaboration posts yet</p>
+              <p className="text-sm mb-6">Create your first post to start connecting with creators</p>
+              <Button variant="gradient" onClick={() => navigate("/publish-post")}>
+                <Plus className="w-4 h-4 mr-2" />
+                Create Your First Post
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {posts.map((post) => (
+                <Card key={post.id} className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-xl font-bold mb-1">{post.brand_name}</h3>
+                      <p className="text-sm text-muted-foreground">{post.category}</p>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {new Date(post.created_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground mb-4">{post.description}</p>
+                  <div className="flex gap-4 text-sm">
+                    <span className="text-primary font-semibold">{post.compensation}</span>
+                    <span className="text-muted-foreground">{post.target_audience}</span>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
         </Card>
       </div>
     </div>

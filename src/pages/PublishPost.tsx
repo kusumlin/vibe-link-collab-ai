@@ -7,18 +7,62 @@ import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
 import { Sparkles, Briefcase } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function PublishPost() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Post Published!",
-      description: "Your collaboration opportunity has been posted successfully.",
-    });
-    navigate("/brand-dashboard");
+    setIsSubmitting(true);
+
+    const formData = new FormData(e.target as HTMLFormElement);
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to publish a post",
+          variant: "destructive",
+        });
+        navigate("/auth");
+        return;
+      }
+
+      const { error } = await supabase.from("collaboration_posts").insert({
+        brand_user_id: user.id,
+        brand_name: formData.get("brandName") as string,
+        category: formData.get("category") as string,
+        description: formData.get("postDescription") as string,
+        compensation: formData.get("compensation") as string,
+        target_audience: formData.get("targetAudience") as string,
+        target_age_range: formData.get("age") as string,
+        target_gender: formData.get("gender") as string,
+        campaign_brief: formData.get("campaignBrief") as string,
+        image_url: formData.get("imageUrl") as string || null,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Post Published!",
+        description: "Your collaboration opportunity has been posted successfully.",
+      });
+      navigate("/brand-dashboard");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to publish post",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -122,8 +166,8 @@ export default function PublishPost() {
             />
           </div>
 
-          <Button type="submit" variant="gradient" className="w-full" size="lg">
-            Publish Collaboration
+          <Button type="submit" variant="gradient" className="w-full" size="lg" disabled={isSubmitting}>
+            {isSubmitting ? "Publishing..." : "Publish Collaboration"}
           </Button>
 
           <div className="text-center">

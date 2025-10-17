@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
 import { Sparkles, User, Briefcase } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 type UserType = "creator" | "brand" | null;
 type AuthMode = "login" | "signup";
@@ -17,17 +18,56 @@ export default function Auth() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleAuth = (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: authMode === "login" ? "Login Successful!" : "Account Created!",
-      description: `Welcome to VibeLink as a ${userType}!`,
-    });
-    // Redirect based on user type
-    if (userType === "creator") {
-      navigate("/dashboard");
-    } else if (userType === "brand") {
-      navigate("/brand-dashboard");
+    const formData = new FormData(e.target as HTMLFormElement);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    try {
+      if (authMode === "signup") {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              user_type: userType,
+            },
+          },
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Account Created!",
+          description: `Welcome to VibeLink as a ${userType}!`,
+        });
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Login Successful!",
+          description: `Welcome back!`,
+        });
+      }
+
+      // Redirect based on user type
+      if (userType === "creator") {
+        navigate("/dashboard");
+      } else if (userType === "brand") {
+        navigate("/brand-dashboard");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "An error occurred during authentication",
+        variant: "destructive",
+      });
     }
   };
 
