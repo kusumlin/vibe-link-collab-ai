@@ -1,0 +1,4 @@
+project_id = "ocpaqqqmhzrvogoofrha"
+
+[functions.collabbot-chat]
+verify_jwt = false

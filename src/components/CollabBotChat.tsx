@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Sparkles } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import collabBotAvatar from "@/assets/collabbot-avatar.png";
 
 interface Message {
   id: string;
-  role: 'user' | 'bot';
+  role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
 }
@@ -17,15 +18,103 @@ export const CollabBotChat = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      role: 'bot',
-      content: "Hey there! 👋 I'm CollabBot, your AI collaboration assistant. I'm here to help you find amazing brand partnerships, schedule meetings, and negotiate fair deals. What would you like to work on today?",
+      role: 'assistant',
+      content: "Hey there! 👋 I'm CollabBot, your AI collaboration assistant. I'm here to help you find amazing brand partnerships, schedule meetings, and track your collaborations. What would you like to work on today?",
       timestamp: new Date(),
     }
   ]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  const streamChat = async (userMessages: Message[]) => {
+    const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/collabbot-chat`;
+    
+    const response = await fetch(CHAT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify({ 
+        messages: userMessages.map(m => ({ role: m.role, content: m.content }))
+      }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        throw new Error("Rate limit exceeded. Please try again in a moment.");
+      }
+      if (response.status === 402) {
+        throw new Error("AI credits depleted. Please add credits to continue.");
+      }
+      throw new Error("Failed to get response from CollabBot");
+    }
+
+    if (!response.body) throw new Error("No response body");
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let textBuffer = "";
+    let assistantContent = "";
+
+    const botMessage: Message = {
+      id: Date.now().toString(),
+      role: 'assistant',
+      content: "",
+      timestamp: new Date(),
+    };
+    setMessages(prev => [...prev, botMessage]);
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      
+      textBuffer += decoder.decode(value, { stream: true });
+
+      let newlineIndex: number;
+      while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+        let line = textBuffer.slice(0, newlineIndex);
+        textBuffer = textBuffer.slice(newlineIndex + 1);
+
+        if (line.endsWith("\r")) line = line.slice(0, -1);
+        if (line.startsWith(":") || line.trim() === "") continue;
+        if (!line.startsWith("data: ")) continue;
+
+        const jsonStr = line.slice(6).trim();
+        if (jsonStr === "[DONE]") break;
+
+        try {
+          const parsed = JSON.parse(jsonStr);
+          const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+          if (content) {
+            assistantContent += content;
+            setMessages(prev => {
+              const updated = [...prev];
+              const lastMsg = updated[updated.length - 1];
+              if (lastMsg.role === 'assistant') {
+                lastMsg.content = assistantContent;
+              }
+              return updated;
+            });
+          }
+        } catch {
+          textBuffer = line + "\n" + textBuffer;
+          break;
+        }
+      }
+    }
+  };
+
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -36,17 +125,21 @@ export const CollabBotChat = () => {
 
     setMessages(prev => [...prev, userMessage]);
     setInput("");
+    setIsLoading(true);
 
-    // Simulate bot response
-    setTimeout(() => {
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'bot',
-        content: "I'm analyzing your request and finding the best opportunities for you! ✨ This is a demo version - connect to Lovable Cloud to enable full AI features.",
-        timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, botMessage]);
-    }, 1000);
+    try {
+      await streamChat([...messages, userMessage]);
+    } catch (error) {
+      console.error("Chat error:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to send message",
+        variant: "destructive",
+      });
+      setMessages(prev => prev.slice(0, -1));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -73,7 +166,7 @@ export const CollabBotChat = () => {
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-6">
+      <ScrollArea className="flex-1 p-6" ref={scrollRef}>
         <div className="space-y-4">
           {messages.map((message) => (
             <div
@@ -82,7 +175,7 @@ export const CollabBotChat = () => {
                 message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
               }`}
             >
-              {message.role === 'bot' && (
+              {message.role === 'assistant' && (
                 <img 
                   src={collabBotAvatar} 
                   alt="CollabBot" 
@@ -99,7 +192,7 @@ export const CollabBotChat = () => {
                   }
                 `}
               >
-                <p className="text-sm leading-relaxed">{message.content}</p>
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
                 <span className="text-xs opacity-70 mt-1 block">
                   {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
@@ -124,6 +217,7 @@ export const CollabBotChat = () => {
             variant="gradient"
             size="icon"
             className="h-12 w-12 rounded-full"
+            disabled={isLoading}
           >
             <Send className="w-5 h-5" />
           </Button>
