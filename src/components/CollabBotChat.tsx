@@ -6,12 +6,23 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import collabBotAvatar from "@/assets/collabbot-avatar.png";
+import { JobPostingCard } from "./JobPostingCard";
 
 interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  jobPostings?: Array<{
+    brandName: string;
+    category: string;
+    description: string;
+    compensation: string;
+    targetAudience?: string;
+    targetAge?: string;
+    targetGender?: string;
+    link?: string;
+  }>;
 }
 
 export const CollabBotChat = () => {
@@ -33,6 +44,26 @@ export const CollabBotChat = () => {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  const parseJobPostings = (content: string) => {
+    const jobPostings = [];
+    const regex = /\*\*(.+?)\*\*\s*-\s*(.+?)\n[\s\S]*?Compensation:\s*(.+?)\n[\s\S]*?Target Age:\s*(.+?)\n[\s\S]*?Target Gender:\s*(.+?)\n[\s\S]*?View Link:\s*(.+?)(?:\n|$)/g;
+    
+    let match;
+    while ((match = regex.exec(content)) !== null) {
+      jobPostings.push({
+        brandName: match[1].trim(),
+        category: match[2].trim(),
+        description: content.substring(match.index, match.index + 150).replace(/\*\*/g, '').split('\n')[1]?.trim() || '',
+        compensation: match[3].trim(),
+        targetAge: match[4].trim(),
+        targetGender: match[5].trim(),
+        link: match[6].trim()
+      });
+    }
+    
+    return jobPostings;
+  };
 
   const streamChat = async (userMessages: Message[]) => {
     const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/collabbot-chat`;
@@ -70,6 +101,7 @@ export const CollabBotChat = () => {
       role: 'assistant',
       content: "",
       timestamp: new Date(),
+      jobPostings: []
     };
     setMessages(prev => [...prev, botMessage]);
 
@@ -101,6 +133,7 @@ export const CollabBotChat = () => {
               const lastMsg = updated[updated.length - 1];
               if (lastMsg.role === 'assistant') {
                 lastMsg.content = assistantContent;
+                lastMsg.jobPostings = parseJobPostings(assistantContent);
               }
               return updated;
             });
@@ -183,19 +216,29 @@ export const CollabBotChat = () => {
                 />
               )}
               
-              <div
-                className={`
-                  max-w-[80%] px-4 py-3 rounded-2xl
-                  ${message.role === 'user' 
-                    ? 'bg-primary text-primary-foreground ml-auto' 
-                    : 'bg-muted text-foreground'
-                  }
-                `}
-              >
-                <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
-                <span className="text-xs opacity-70 mt-1 block">
-                  {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </span>
+              <div className={`max-w-[80%] space-y-3 ${message.role === 'user' ? 'ml-auto' : ''}`}>
+                <div
+                  className={`
+                    px-4 py-3 rounded-2xl
+                    ${message.role === 'user' 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'bg-muted text-foreground'
+                    }
+                  `}
+                >
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                  <span className="text-xs opacity-70 mt-1 block">
+                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+                
+                {message.role === 'assistant' && message.jobPostings && message.jobPostings.length > 0 && (
+                  <div className="space-y-2">
+                    {message.jobPostings.map((job, idx) => (
+                      <JobPostingCard key={idx} {...job} />
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           ))}
