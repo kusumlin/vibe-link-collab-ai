@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source srcset="assets/vibelink-logo@2x.png 2x, assets/vibelink-logo.png 1x" />
-    <img src="assets/vibelink-logo.png" alt="VibeLink logo" width="560">
+    <source srcset="vibelink-logo@2x.png 2x, assets/vibelink-logo.png 1x" />
+    <img src="vibelink-logo.png" alt="VibeLink logo" width="560">
   </picture>
 </p>
 
