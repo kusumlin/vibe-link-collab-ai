@@ -61,6 +61,7 @@ export type Database = {
           target_audience: string
           target_gender: string
           updated_at: string | null
+          views: number | null
         }
         Insert: {
           brand_name: string
@@ -76,6 +77,7 @@ export type Database = {
           target_audience: string
           target_gender: string
           updated_at?: string | null
+          views?: number | null
         }
         Update: {
           brand_name?: string
@@ -91,6 +93,7 @@ export type Database = {
           target_audience?: string
           target_gender?: string
           updated_at?: string | null
+          views?: number | null
         }
         Relationships: []
       }

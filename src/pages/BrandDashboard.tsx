@@ -15,6 +15,7 @@ interface CollaborationPost {
   target_audience: string;
   created_at: string;
   applicant_count?: number;
+  views?: number;
 }
 
 export default function BrandDashboard() {
@@ -23,6 +24,7 @@ export default function BrandDashboard() {
   const [posts, setPosts] = useState<CollaborationPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [totalApplicants, setTotalApplicants] = useState(0);
+  const [totalViews, setTotalViews] = useState(0);
 
   useEffect(() => {
     fetchPosts();
@@ -66,6 +68,10 @@ export default function BrandDashboard() {
         // Calculate total applicants
         const total = postsWithCounts.reduce((sum, post) => sum + (post.applicant_count || 0), 0);
         setTotalApplicants(total);
+        
+        // Calculate total views
+        const views = postsWithCounts.reduce((sum, post) => sum + (post.views || 0), 0);
+        setTotalViews(views);
       }
     } catch (error: any) {
       toast({
@@ -122,7 +128,7 @@ export default function BrandDashboard() {
               <Eye className="w-6 h-6 text-white" />
             </div>
             <h3 className="text-xl font-semibold">Total Views</h3>
-            <p className="text-3xl font-bold">0</p>
+            <p className="text-3xl font-bold">{totalViews}</p>
           </Card>
         </div>
 

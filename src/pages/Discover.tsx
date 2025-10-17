@@ -47,6 +47,24 @@ const Discover = () => {
   }, []);
 
   const handleSwipe = async (brandId: string, liked: boolean) => {
+    // Increment view count for this post
+    try {
+      const { data: post } = await supabase
+        .from('collaboration_posts')
+        .select('views')
+        .eq('id', brandId)
+        .single();
+      
+      if (post) {
+        await supabase
+          .from('collaboration_posts')
+          .update({ views: (post.views || 0) + 1 })
+          .eq('id', brandId);
+      }
+    } catch (error) {
+      console.error('Error updating views:', error);
+    }
+
     if (liked) {
       try {
         const { data: { user } } = await supabase.auth.getUser();
