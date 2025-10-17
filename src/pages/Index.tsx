@@ -3,8 +3,29 @@ import { Features } from "@/components/Features";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Sparkles, Search, MessageSquare, LogIn } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { LogoutButton } from "@/components/LogoutButton";
+
 const Index = () => {
   const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsLoggedIn(!!session);
+    };
+
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsLoggedIn(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   return <div className="min-h-screen">
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -23,10 +44,14 @@ const Index = () => {
               <Search className="w-4 h-4 mr-2" />
               Discover Brands
             </Button>
-            <Button variant="outline" onClick={() => navigate('/auth?mode=login')}>
-              <LogIn className="w-4 h-4 mr-2" />
-              Log In
-            </Button>
+            {isLoggedIn ? (
+              <LogoutButton />
+            ) : (
+              <Button variant="outline" onClick={() => navigate('/auth?mode=login')}>
+                <LogIn className="w-4 h-4 mr-2" />
+                Log In
+              </Button>
+            )}
           </div>
         </div>
       </nav>

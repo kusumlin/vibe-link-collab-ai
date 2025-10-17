@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Sparkles, Briefcase, Plus, TrendingUp, Users, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { LogoutButton } from "@/components/LogoutButton";
 
 interface CollaborationPost {
   id: string;
@@ -103,6 +104,7 @@ export default function BrandDashboard() {
             <Button variant="outline" onClick={() => navigate("/")}>
               Back to Home
             </Button>
+            <LogoutButton />
           </div>
         </div>
 

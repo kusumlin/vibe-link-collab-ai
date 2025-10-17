@@ -5,6 +5,7 @@ import { Sparkles, MessageSquare, TrendingUp, Calendar, Target, Star } from "luc
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { LogoutButton } from "@/components/LogoutButton";
 
 interface CollaborationPost {
   id: string;
@@ -157,9 +158,12 @@ export default function Dashboard() {
             </div>
             <h1 className="text-3xl font-bold">Creator Dashboard</h1>
           </div>
-          <Button variant="outline" onClick={() => navigate("/")}>
-            Back to Home
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => navigate("/")}>
+              Back to Home
+            </Button>
+            <LogoutButton />
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 mb-8">
