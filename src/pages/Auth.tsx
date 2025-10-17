@@ -114,10 +114,29 @@ export default function Auth() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="audience">Audience Demographics</Label>
+                <Label htmlFor="age">Age</Label>
                 <Input 
-                  id="audience" 
-                  placeholder="e.g., 18-35, Female, USA" 
+                  id="age" 
+                  type="number"
+                  placeholder="e.g., 25" 
+                  required 
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="gender">Gender</Label>
+                <Input 
+                  id="gender" 
+                  placeholder="e.g., Female, Male, Non-binary" 
+                  required 
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="postalCode">Postal Code</Label>
+                <Input 
+                  id="postalCode" 
+                  placeholder="e.g., 90210" 
                   required 
                 />
               </div>
@@ -137,11 +156,12 @@ export default function Auth() {
           {authMode === "signup" && userType === "brand" && (
             <>
               <div className="space-y-2">
-                <Label htmlFor="campaignType">Campaign Type</Label>
-                <Input 
-                  id="campaignType" 
-                  placeholder="e.g., Product Launch, Brand Awareness, Affiliate" 
+                <Label htmlFor="brandDescription">Brand Description</Label>
+                <Textarea 
+                  id="brandDescription" 
+                  placeholder="Tell us about your brand, values, and what makes you unique"
                   required 
+                  rows={3}
                 />
               </div>
 

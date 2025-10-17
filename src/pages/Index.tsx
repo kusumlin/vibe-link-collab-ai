@@ -36,6 +36,49 @@ const Index = () => {
       {/* Features Section */}
       <Features />
 
+      {/* Collabot Section */}
+      <section className="py-24 px-4 bg-gradient-to-b from-primary/5 to-background">
+        <div className="container mx-auto text-center space-y-8 max-w-4xl">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+            <MessageSquare className="w-4 h-4 text-primary" />
+            <span className="text-sm font-medium text-primary">AI-Powered Assistant</span>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold">
+            Meet
+            <span className="gradient-sunset text-gradient block mt-2">CollabBot</span>
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Your AI-powered collaboration manager that connects creators and brands seamlessly. 
+            CollabBot reads your profile, understands your expertise, and suggests perfect brand 
+            matches based on your skills, content style, and audience demographics.
+          </p>
+          <div className="grid md:grid-cols-3 gap-6 pt-8">
+            <div className="p-6 rounded-xl border border-primary/10 bg-card hover:shadow-lg transition-all">
+              <h3 className="font-semibold mb-2">Smart Matching</h3>
+              <p className="text-sm text-muted-foreground">
+                Analyzes creator profiles and brand requirements to find perfect partnerships
+              </p>
+            </div>
+            <div className="p-6 rounded-xl border border-primary/10 bg-card hover:shadow-lg transition-all">
+              <h3 className="font-semibold mb-2">Schedule Management</h3>
+              <p className="text-sm text-muted-foreground">
+                Handles meeting coordination and calendar scheduling automatically
+              </p>
+            </div>
+            <div className="p-6 rounded-xl border border-primary/10 bg-card hover:shadow-lg transition-all">
+              <h3 className="font-semibold mb-2">Follow-ups & Tracking</h3>
+              <p className="text-sm text-muted-foreground">
+                Keeps track of applications, sends reminders, and manages communications
+              </p>
+            </div>
+          </div>
+          <Button variant="gradient" size="lg" onClick={() => navigate('/chat')} className="mt-8">
+            <MessageSquare className="w-4 h-4 mr-2" />
+            Chat with CollabBot
+          </Button>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-24 px-4 bg-gradient-to-b from-background to-primary/5">
         <div className="container mx-auto text-center space-y-8 max-w-3xl">
