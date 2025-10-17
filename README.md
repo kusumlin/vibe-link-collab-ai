@@ -1,8 +1,5 @@
 <p align="center">
-  <picture>
-    <source srcset="vibelink-logo@2x.jpg 2x, assets/vibelink-logo.png 1x" />
-    <img src="vibelink-logo.jpg" alt="VibeLink logo" width="560">
-  </picture>
+  <img src="vibelink-logo.jpg" alt="VibeLink logo" width="560">
 </p>
 
 <h1 align="center">VibeLink — Turn your infulence into meaningful partnerships</h1>
