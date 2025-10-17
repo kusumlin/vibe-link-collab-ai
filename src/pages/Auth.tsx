@@ -26,11 +26,17 @@ export default function Auth() {
       
       if (session?.user) {
         const userType = session.user.user_metadata?.user_type;
+        console.log("Auth page: User already logged in as", userType, "- redirecting to dashboard");
+        
+        // Only auto-redirect if user came here directly (not from home page)
+        // This allows users to click "Back to Home" and stay logged in
         if (userType === "creator") {
           navigate("/dashboard", { replace: true });
         } else if (userType === "brand") {
           navigate("/brand-dashboard", { replace: true });
         }
+      } else {
+        console.log("Auth page: No active session");
       }
     };
 
@@ -131,7 +137,10 @@ export default function Auth() {
         <div className="container max-w-4xl mx-auto">
           <Button
             variant="ghost"
-            onClick={() => navigate('/')}
+            onClick={() => {
+              console.log("Auth: Navigating to home (session preserved)");
+              navigate('/');
+            }}
             className="mb-8"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -186,7 +195,10 @@ export default function Auth() {
       <div className="w-full max-w-2xl">
         <Button
           variant="ghost"
-          onClick={() => navigate('/')}
+          onClick={() => {
+            console.log("Auth: Navigating to home (session preserved)");
+            navigate('/');
+          }}
           className="mb-4"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
