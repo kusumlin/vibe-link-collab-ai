@@ -30,19 +30,31 @@ export default function BrandDashboard() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          console.log("Brand Dashboard: No session, redirecting to login");
+          navigate("/auth?mode=login", { replace: true });
+          return;
+        }
+        
+        console.log("Brand Dashboard: Session valid, loading data");
+        setIsAuthenticated(true);
+        fetchPosts();
+      } catch (error) {
+        console.error("Brand Dashboard: Auth check error", error);
         navigate("/auth?mode=login", { replace: true });
-        return;
       }
-      setIsAuthenticated(true);
-      fetchPosts();
     };
 
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Brand Dashboard: Auth state changed -", event);
+      
       if (!session) {
+        console.log("Brand Dashboard: Session lost, redirecting to login");
         navigate("/auth?mode=login", { replace: true });
       }
     });

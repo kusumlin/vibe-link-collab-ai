@@ -16,22 +16,33 @@ const Index = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session?.user) {
-        const type = session.user.user_metadata?.user_type;
-        setUserType(type);
-        setIsLoggedIn(true);
-      } else {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session?.user) {
+          const type = session.user.user_metadata?.user_type;
+          console.log("Home page: User authenticated as", type);
+          setUserType(type);
+          setIsLoggedIn(true);
+        } else {
+          console.log("Home page: No active session");
+          setIsLoggedIn(false);
+          setUserType(null);
+        }
+      } catch (error) {
+        console.error("Home page: Error checking auth", error);
         setIsLoggedIn(false);
         setUserType(null);
+      } finally {
+        setIsChecking(false);
       }
-      setIsChecking(false);
     };
 
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Home page: Auth state changed -", event);
+      
       if (session?.user) {
         const type = session.user.user_metadata?.user_type;
         setUserType(type);

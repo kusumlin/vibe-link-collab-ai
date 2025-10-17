@@ -81,20 +81,32 @@ export default function Dashboard() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          console.log("Dashboard: No session, redirecting to login");
+          navigate("/auth?mode=login", { replace: true });
+          return;
+        }
+        
+        console.log("Dashboard: Session valid, loading data");
+        setIsAuthenticated(true);
+        fetchMatchedCollaborations();
+        fetchActiveApplications();
+      } catch (error) {
+        console.error("Dashboard: Auth check error", error);
         navigate("/auth?mode=login", { replace: true });
-        return;
       }
-      setIsAuthenticated(true);
-      fetchMatchedCollaborations();
-      fetchActiveApplications();
     };
 
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Dashboard: Auth state changed -", event);
+      
       if (!session) {
+        console.log("Dashboard: Session lost, redirecting to login");
         navigate("/auth?mode=login", { replace: true });
       }
     });
