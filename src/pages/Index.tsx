@@ -12,6 +12,7 @@ const Index = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userType, setUserType] = useState<string | null>(null);
   const [isChecking, setIsChecking] = useState(true);
+  const [isDashboardLoading, setIsDashboardLoading] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -44,11 +45,40 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const handleDashboardClick = () => {
-    if (userType === "creator") {
-      navigate("/dashboard");
-    } else if (userType === "brand") {
-      navigate("/brand-dashboard");
+  const handleDashboardClick = async () => {
+    setIsDashboardLoading(true);
+    
+    try {
+      // Verify session is still valid before navigating
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error || !session) {
+        // Session invalid or expired - redirect to login
+        console.log("Dashboard click: Session invalid, redirecting to login");
+        navigate("/auth?mode=login", { replace: true });
+        return;
+      }
+
+      // Navigate to appropriate dashboard based on user type
+      const type = session.user.user_metadata?.user_type;
+      console.log(`Dashboard click: Navigating ${type} to dashboard`);
+      
+      if (type === "creator") {
+        navigate("/dashboard");
+      } else if (type === "brand") {
+        navigate("/brand-dashboard");
+      } else {
+        // Unknown user type - redirect to login
+        console.log("Dashboard click: Unknown user type, redirecting to login");
+        navigate("/auth?mode=login", { replace: true });
+      }
+    } catch (error) {
+      console.error("Dashboard click error:", error);
+      // On error, redirect to login
+      navigate("/auth?mode=login", { replace: true });
+    } finally {
+      // Reset loading state after a short delay (navigation might take a moment)
+      setTimeout(() => setIsDashboardLoading(false), 500);
     }
   };
 
@@ -82,9 +112,13 @@ const Index = () => {
               Discover Brands
             </Button>
             {isLoggedIn && (
-              <Button variant="gradient" onClick={handleDashboardClick}>
+              <Button 
+                variant="gradient" 
+                onClick={handleDashboardClick}
+                disabled={isDashboardLoading}
+              >
                 <LayoutDashboard className="w-4 h-4 mr-2" />
-                Dashboard
+                {isDashboardLoading ? "Loading..." : "Dashboard"}
               </Button>
             )}
             {isLoggedIn ? (

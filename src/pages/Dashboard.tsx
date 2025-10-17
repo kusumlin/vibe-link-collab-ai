@@ -125,14 +125,23 @@ export default function Dashboard() {
         return;
       }
 
-      // Fetch creator profile
+      // Fetch creator profile - use maybeSingle instead of single to handle missing profiles
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("skills, age, gender, postal_code, content_style")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error("Error fetching profile:", profileError);
+        throw profileError;
+      }
+
+      if (!profile) {
+        console.warn("No profile found for user");
+        setMatchedPosts([]);
+        return;
+      }
 
       // Fetch all collaboration posts
       const { data: posts, error: postsError } = await supabase
