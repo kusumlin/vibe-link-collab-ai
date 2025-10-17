@@ -1,8 +1,14 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import heroSunset from "@/assets/hero-sunset.jpg";
+import { DemoVideo } from "./DemoVideo";
 
 export const Hero = () => {
+  const navigate = useNavigate();
+  const [showDemo, setShowDemo] = useState(false);
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image with Overlay */}
@@ -40,14 +46,25 @@ export const Hero = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-            <Button variant="gradient" size="xl" className="group">
+            <Button 
+              variant="gradient" 
+              size="xl" 
+              className="group"
+              onClick={() => navigate('/auth')}
+            >
               Get Started Free
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button variant="outline" size="xl">
+            <Button 
+              variant="outline" 
+              size="xl"
+              onClick={() => setShowDemo(true)}
+            >
               Watch Demo
             </Button>
           </div>
+
+          <DemoVideo open={showDemo} onOpenChange={setShowDemo} />
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-8 pt-12 max-w-2xl mx-auto">

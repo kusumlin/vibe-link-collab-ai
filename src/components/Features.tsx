@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Sparkles, Calendar, DollarSign, Users, Shield, MessageSquare } from "lucide-react";
+import { Sparkles, Calendar, Shield } from "lucide-react";
 
 const features = [
   {
@@ -15,27 +15,9 @@ const features = [
     gradient: "gradient-purple",
   },
   {
-    icon: DollarSign,
-    title: "Fair Pay Estimator",
-    description: "Get AI-powered compensation recommendations based on your reach and engagement.",
-    gradient: "gradient-sunset",
-  },
-  {
-    icon: MessageSquare,
-    title: "Auto-Negotiation",
-    description: "CollabBot handles initial brand conversations and negotiates on your behalf.",
-    gradient: "gradient-pink",
-  },
-  {
     icon: Shield,
     title: "Ethical AI Dashboard",
     description: "Full transparency into how AI makes decisions and why brands are suggested.",
-    gradient: "gradient-purple",
-  },
-  {
-    icon: Users,
-    title: "Community Connect",
-    description: "Join a vibrant community of creators sharing tips, celebrating wins, and growing together.",
     gradient: "gradient-sunset",
   },
 ];
