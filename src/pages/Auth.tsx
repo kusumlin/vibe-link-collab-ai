@@ -23,7 +23,12 @@ export default function Auth() {
       title: authMode === "login" ? "Login Successful!" : "Account Created!",
       description: `Welcome to VibeLink as a ${userType}!`,
     });
-    navigate("/");
+    // Redirect based on user type
+    if (userType === "creator") {
+      navigate("/dashboard");
+    } else if (userType === "brand") {
+      navigate("/publish-post");
+    }
   };
 
   if (!userType) {
@@ -160,25 +165,6 @@ export default function Auth() {
                 <Textarea 
                   id="brandDescription" 
                   placeholder="Tell us about your brand, values, and what makes you unique"
-                  required 
-                  rows={3}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="targetAudience">Target Audience</Label>
-                <Input 
-                  id="targetAudience" 
-                  placeholder="e.g., Young professionals, Fitness enthusiasts" 
-                  required 
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="contentRequirements">Content Requirements / Preferences</Label>
-                <Textarea 
-                  id="contentRequirements" 
-                  placeholder="e.g., Authentic product reviews, 3-5 posts per month, Instagram focus"
                   required 
                   rows={3}
                 />
