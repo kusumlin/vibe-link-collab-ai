@@ -27,7 +27,7 @@ export default function Auth() {
     if (userType === "creator") {
       navigate("/dashboard");
     } else if (userType === "brand") {
-      navigate("/publish-post");
+      navigate("/brand-dashboard");
     }
   };
 

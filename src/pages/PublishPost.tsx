@@ -18,7 +18,7 @@ export default function PublishPost() {
       title: "Post Published!",
       description: "Your collaboration opportunity has been posted successfully.",
     });
-    navigate("/dashboard");
+    navigate("/brand-dashboard");
   };
 
   return (

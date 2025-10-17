@@ -8,6 +8,7 @@ import Discover from "./pages/Discover";
 import Chat from "./pages/Chat";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import BrandDashboard from "./pages/BrandDashboard";
 import PublishPost from "./pages/PublishPost";
 import NotFound from "./pages/NotFound";
 
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/chat" element={<Chat />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/brand-dashboard" element={<BrandDashboard />} />
           <Route path="/publish-post" element={<PublishPost />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
