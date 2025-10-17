@@ -77,11 +77,30 @@ export default function Dashboard() {
   const [matchedPosts, setMatchedPosts] = useState<CollaborationPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeApplications, setActiveApplications] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    fetchMatchedCollaborations();
-    fetchActiveApplications();
-  }, []);
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/auth?mode=login", { replace: true });
+        return;
+      }
+      setIsAuthenticated(true);
+      fetchMatchedCollaborations();
+      fetchActiveApplications();
+    };
+
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!session) {
+        navigate("/auth?mode=login", { replace: true });
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   const fetchActiveApplications = async () => {
     try {
@@ -103,7 +122,6 @@ export default function Dashboard() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        navigate("/auth");
         return;
       }
 

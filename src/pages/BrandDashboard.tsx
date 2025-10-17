@@ -26,17 +26,35 @@ export default function BrandDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [totalApplicants, setTotalApplicants] = useState(0);
   const [totalViews, setTotalViews] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/auth?mode=login", { replace: true });
+        return;
+      }
+      setIsAuthenticated(true);
+      fetchPosts();
+    };
+
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!session) {
+        navigate("/auth?mode=login", { replace: true });
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   const fetchPosts = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        navigate("/auth");
         return;
       }
 

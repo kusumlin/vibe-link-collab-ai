@@ -19,6 +19,24 @@ export default function Auth() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Redirect if already logged in
+  useEffect(() => {
+    const checkExistingSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        const userType = session.user.user_metadata?.user_type;
+        if (userType === "creator") {
+          navigate("/dashboard", { replace: true });
+        } else if (userType === "brand") {
+          navigate("/brand-dashboard", { replace: true });
+        }
+      }
+    };
+
+    checkExistingSession();
+  }, [navigate]);
+
   useEffect(() => {
     const mode = searchParams.get("mode");
     if (mode === "login") {
@@ -69,11 +87,11 @@ export default function Auth() {
           description: `Welcome to VibeLink as a ${userType}!`,
         });
         
-        // Redirect based on user type
+        // Redirect based on user type with replace to prevent back navigation
         if (userType === "creator") {
-          navigate("/dashboard");
+          navigate("/dashboard", { replace: true });
         } else if (userType === "brand") {
-          navigate("/brand-dashboard");
+          navigate("/brand-dashboard", { replace: true });
         }
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -88,14 +106,14 @@ export default function Auth() {
           description: `Welcome back!`,
         });
 
-        // Get user type from profile to redirect correctly
+        // Get user type from profile to redirect correctly with replace
         const userTypeFromProfile = data.user?.user_metadata?.user_type;
         if (userTypeFromProfile === "creator") {
-          navigate("/dashboard");
+          navigate("/dashboard", { replace: true });
         } else if (userTypeFromProfile === "brand") {
-          navigate("/brand-dashboard");
+          navigate("/brand-dashboard", { replace: true });
         } else {
-          navigate("/");
+          navigate("/dashboard", { replace: true });
         }
       }
     } catch (error: any) {
