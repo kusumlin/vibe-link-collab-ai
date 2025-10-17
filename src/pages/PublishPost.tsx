@@ -127,13 +127,14 @@ export default function PublishPost() {
           </Button>
 
           <div className="text-center">
-            <button
+            <Button
               type="button"
-              onClick={() => navigate("/")}
-              className="text-sm text-muted-foreground hover:text-primary"
+              variant="ghost"
+              onClick={() => navigate(-1)}
+              className="w-full"
             >
-              ← Back to Home
-            </button>
+              ← Back
+            </Button>
           </div>
         </form>
       </Card>
