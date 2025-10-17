@@ -25,9 +25,9 @@ export const Hero = () => {
 
           {/* Heading */}
           <h1 className="text-5xl md:text-7xl font-bold leading-tight">
-            Turn Your Influence Into
+            Link your vibe
             <span className="gradient-sunset text-gradient block mt-2">
-              Meaningful Partnerships
+              Land your next collab
             </span>
           </h1>
 
