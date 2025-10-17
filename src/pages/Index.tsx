@@ -10,21 +10,58 @@ import { LogoutButton } from "@/components/LogoutButton";
 const Index = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      setIsLoggedIn(!!session);
+      
+      if (session?.user) {
+        // Redirect to appropriate dashboard based on user type
+        const userType = session.user.user_metadata?.user_type;
+        if (userType === "creator") {
+          navigate("/dashboard", { replace: true });
+        } else if (userType === "brand") {
+          navigate("/brand-dashboard", { replace: true });
+        } else {
+          setIsLoggedIn(true);
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
+      setIsChecking(false);
     };
 
     checkAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setIsLoggedIn(!!session);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        const userType = session.user.user_metadata?.user_type;
+        if (userType === "creator") {
+          navigate("/dashboard", { replace: true });
+        } else if (userType === "brand") {
+          navigate("/brand-dashboard", { replace: true });
+        } else {
+          setIsLoggedIn(true);
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate]);
+
+  if (isChecking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Sparkles className="w-8 h-8 text-primary animate-spin mx-auto mb-2" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return <div className="min-h-screen">
       {/* Navigation */}
