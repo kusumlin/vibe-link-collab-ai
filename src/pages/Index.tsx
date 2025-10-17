@@ -2,7 +2,7 @@ import { Hero } from "@/components/Hero";
 import { Features } from "@/components/Features";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, Search, MessageSquare } from "lucide-react";
+import { Sparkles, Search, MessageSquare, LogIn } from "lucide-react";
 const Index = () => {
   const navigate = useNavigate();
   return <div className="min-h-screen">
@@ -22,6 +22,10 @@ const Index = () => {
             <Button variant="gradient" onClick={() => navigate('/discover')}>
               <Search className="w-4 h-4 mr-2" />
               Discover Brands
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/auth?mode=login')}>
+              <LogIn className="w-4 h-4 mr-2" />
+              Log In
             </Button>
           </div>
         </div>

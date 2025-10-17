@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Sparkles, User, Briefcase } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,10 +13,18 @@ type UserType = "creator" | "brand" | null;
 type AuthMode = "login" | "signup";
 
 export default function Auth() {
+  const [searchParams] = useSearchParams();
   const [userType, setUserType] = useState<UserType>(null);
   const [authMode, setAuthMode] = useState<AuthMode>("signup");
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const mode = searchParams.get("mode");
+    if (mode === "login") {
+      setAuthMode("login");
+    }
+  }, [searchParams]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,8 +68,15 @@ export default function Auth() {
           title: "Account Created!",
           description: `Welcome to VibeLink as a ${userType}!`,
         });
+        
+        // Redirect based on user type
+        if (userType === "creator") {
+          navigate("/dashboard");
+        } else if (userType === "brand") {
+          navigate("/brand-dashboard");
+        }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
@@ -72,13 +87,16 @@ export default function Auth() {
           title: "Login Successful!",
           description: `Welcome back!`,
         });
-      }
 
-      // Redirect based on user type
-      if (userType === "creator") {
-        navigate("/dashboard");
-      } else if (userType === "brand") {
-        navigate("/brand-dashboard");
+        // Get user type from profile to redirect correctly
+        const userTypeFromProfile = data.user?.user_metadata?.user_type;
+        if (userTypeFromProfile === "creator") {
+          navigate("/dashboard");
+        } else if (userTypeFromProfile === "brand") {
+          navigate("/brand-dashboard");
+        } else {
+          navigate("/");
+        }
       }
     } catch (error: any) {
       toast({
@@ -89,7 +107,7 @@ export default function Auth() {
     }
   };
 
-  if (!userType) {
+  if (!userType && authMode === "signup") {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-background to-primary/5">
         <div className="container max-w-4xl mx-auto">
