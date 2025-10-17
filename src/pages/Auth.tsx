@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Sparkles, User, Briefcase } from "lucide-react";
+import { Sparkles, User, Briefcase, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -111,6 +111,15 @@ export default function Auth() {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-background to-primary/5">
         <div className="container max-w-4xl mx-auto">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/')}
+            className="mb-8"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Home
+          </Button>
+          
           <div className="text-center space-y-8 mb-12 animate-fadeIn">
             <div className="flex items-center justify-center gap-2">
               <Sparkles className="w-8 h-8 text-primary" />
@@ -156,7 +165,17 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-b from-background to-primary/5">
-      <Card className="w-full max-w-2xl p-8 space-y-6 animate-fadeIn">
+      <div className="w-full max-w-2xl">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/')}
+          className="mb-4"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Home
+        </Button>
+        
+        <Card className="w-full p-8 space-y-6 animate-fadeIn">
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Sparkles className="w-6 h-6 text-primary" />
@@ -280,6 +299,7 @@ export default function Auth() {
           </div>
         </form>
       </Card>
+      </div>
     </div>
   );
 }
