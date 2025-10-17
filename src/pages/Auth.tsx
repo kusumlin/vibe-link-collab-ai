@@ -152,7 +152,8 @@ export default function Auth() {
               <div className="space-y-2">
                 <Label htmlFor="skills">Skills / Niches</Label>
                 <Input 
-                  id="skills" 
+                  id="skills"
+                  name="skills"
                   placeholder="e.g., Fashion, Tech Reviews, Lifestyle" 
                   required 
                 />
@@ -161,7 +162,8 @@ export default function Auth() {
               <div className="space-y-2">
                 <Label htmlFor="age">Age</Label>
                 <Input 
-                  id="age" 
+                  id="age"
+                  name="age"
                   type="number"
                   placeholder="e.g., 25" 
                   required 
@@ -171,7 +173,8 @@ export default function Auth() {
               <div className="space-y-2">
                 <Label htmlFor="gender">Gender</Label>
                 <Input 
-                  id="gender" 
+                  id="gender"
+                  name="gender"
                   placeholder="e.g., Female, Male, Non-binary" 
                   required 
                 />
@@ -180,7 +183,8 @@ export default function Auth() {
               <div className="space-y-2">
                 <Label htmlFor="postalCode">Postal Code</Label>
                 <Input 
-                  id="postalCode" 
+                  id="postalCode"
+                  name="postalCode"
                   placeholder="e.g., 90210" 
                   required 
                 />
@@ -189,7 +193,8 @@ export default function Auth() {
               <div className="space-y-2">
                 <Label htmlFor="contentStyle">Content Style / Primary Platforms</Label>
                 <Textarea 
-                  id="contentStyle" 
+                  id="contentStyle"
+                  name="contentStyle"
                   placeholder="e.g., Short-form video on TikTok and Instagram Reels, fun and energetic style"
                   required 
                   rows={3}
@@ -203,7 +208,8 @@ export default function Auth() {
               <div className="space-y-2">
                 <Label htmlFor="brandDescription">Brand Description</Label>
                 <Textarea 
-                  id="brandDescription" 
+                  id="brandDescription"
+                  name="brandDescription"
                   placeholder="Tell us about your brand, values, and what makes you unique"
                   required 
                   rows={3}
