@@ -2,7 +2,7 @@ import { Hero } from "@/components/Hero";
 import { Features } from "@/components/Features";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, Search, MessageSquare, LogIn } from "lucide-react";
+import { Sparkles, Search, MessageSquare, LogIn, LayoutDashboard } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LogoutButton } from "@/components/LogoutButton";
@@ -10,6 +10,7 @@ import { LogoutButton } from "@/components/LogoutButton";
 const Index = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userType, setUserType] = useState<string | null>(null);
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
@@ -17,17 +18,12 @@ const Index = () => {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session?.user) {
-        // Redirect to appropriate dashboard based on user type
-        const userType = session.user.user_metadata?.user_type;
-        if (userType === "creator") {
-          navigate("/dashboard", { replace: true });
-        } else if (userType === "brand") {
-          navigate("/brand-dashboard", { replace: true });
-        } else {
-          setIsLoggedIn(true);
-        }
+        const type = session.user.user_metadata?.user_type;
+        setUserType(type);
+        setIsLoggedIn(true);
       } else {
         setIsLoggedIn(false);
+        setUserType(null);
       }
       setIsChecking(false);
     };
@@ -36,21 +32,25 @@ const Index = () => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
-        const userType = session.user.user_metadata?.user_type;
-        if (userType === "creator") {
-          navigate("/dashboard", { replace: true });
-        } else if (userType === "brand") {
-          navigate("/brand-dashboard", { replace: true });
-        } else {
-          setIsLoggedIn(true);
-        }
+        const type = session.user.user_metadata?.user_type;
+        setUserType(type);
+        setIsLoggedIn(true);
       } else {
         setIsLoggedIn(false);
+        setUserType(null);
       }
     });
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  const handleDashboardClick = () => {
+    if (userType === "creator") {
+      navigate("/dashboard");
+    } else if (userType === "brand") {
+      navigate("/brand-dashboard");
+    }
+  };
 
   if (isChecking) {
     return (
@@ -81,6 +81,12 @@ const Index = () => {
               <Search className="w-4 h-4 mr-2" />
               Discover Brands
             </Button>
+            {isLoggedIn && (
+              <Button variant="default" onClick={handleDashboardClick}>
+                <LayoutDashboard className="w-4 h-4 mr-2" />
+                Dashboard
+              </Button>
+            )}
             {isLoggedIn ? (
               <LogoutButton />
             ) : (
