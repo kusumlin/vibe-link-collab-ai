@@ -139,12 +139,12 @@ export default function Auth() {
         <form onSubmit={handleAuth} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="you@example.com" required />
+            <Input id="email" name="email" type="email" placeholder="you@example.com" required />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" placeholder="••••••••" required />
+            <Input id="password" name="password" type="password" placeholder="••••••••" required />
           </div>
 
           {authMode === "signup" && userType === "creator" && (

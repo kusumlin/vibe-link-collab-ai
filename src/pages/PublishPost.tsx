@@ -86,7 +86,8 @@ export default function PublishPost() {
           <div className="space-y-2">
             <Label htmlFor="brandName">Brand Name</Label>
             <Input 
-              id="brandName" 
+              id="brandName"
+              name="brandName"
               placeholder="Your brand or company name"
               required 
             />
@@ -95,7 +96,8 @@ export default function PublishPost() {
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
             <Input 
-              id="category" 
+              id="category"
+              name="category"
               placeholder="e.g., Fashion, Tech, Beauty, Lifestyle"
               required 
             />
@@ -104,7 +106,8 @@ export default function PublishPost() {
           <div className="space-y-2">
             <Label htmlFor="postDescription">Description</Label>
             <Textarea 
-              id="postDescription" 
+              id="postDescription"
+              name="postDescription"
               placeholder="Describe your collaboration opportunity, what you're looking for, and what you offer"
               required 
               rows={4}
@@ -114,7 +117,8 @@ export default function PublishPost() {
           <div className="space-y-2">
             <Label htmlFor="compensation">Pay / Compensation</Label>
             <Input 
-              id="compensation" 
+              id="compensation"
+              name="compensation"
               placeholder="e.g., $500-$1000, Product exchange, Commission-based"
               required 
             />
@@ -123,7 +127,8 @@ export default function PublishPost() {
           <div className="space-y-2">
             <Label htmlFor="targetAudience">Target Audience</Label>
             <Input 
-              id="targetAudience" 
+              id="targetAudience"
+              name="targetAudience"
               placeholder="e.g., 18-35 year olds, Female, Urban"
               required 
             />
@@ -132,7 +137,8 @@ export default function PublishPost() {
           <div className="space-y-2">
             <Label htmlFor="age">Target Age Range</Label>
             <Input 
-              id="age" 
+              id="age"
+              name="age"
               placeholder="e.g., 18-35" 
               required 
             />
@@ -141,7 +147,8 @@ export default function PublishPost() {
           <div className="space-y-2">
             <Label htmlFor="gender">Target Gender</Label>
             <Input 
-              id="gender" 
+              id="gender"
+              name="gender"
               placeholder="e.g., All, Female, Male, Non-binary" 
               required 
             />
@@ -150,7 +157,8 @@ export default function PublishPost() {
           <div className="space-y-2">
             <Label htmlFor="campaignBrief">Campaign Brief</Label>
             <Textarea 
-              id="campaignBrief" 
+              id="campaignBrief"
+              name="campaignBrief"
               placeholder="Provide details about the campaign goals, deliverables, timeline, and requirements"
               required 
               rows={4}
@@ -160,7 +168,8 @@ export default function PublishPost() {
           <div className="space-y-2">
             <Label htmlFor="imageUrl">Brand Image URL (Optional)</Label>
             <Input 
-              id="imageUrl" 
+              id="imageUrl"
+              name="imageUrl"
               type="url"
               placeholder="https://example.com/brand-logo.jpg"
             />
