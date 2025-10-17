@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.75.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,12 +14,41 @@ serve(async (req) => {
   try {
     const { messages } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are CollabBot, an AI manager for content creators on VibeLink. Your role is to help creators discover paid collaboration opportunities and manage their partnerships efficiently.
+    // Fetch available collaboration posts
+    const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
+    const { data: posts, error: postsError } = await supabase
+      .from("collaboration_posts")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(20);
+
+    if (postsError) {
+      console.error("Error fetching posts:", postsError);
+    }
+
+    // Format posts for AI context
+    const postsContext = posts && posts.length > 0 
+      ? `\n\n## AVAILABLE BRAND COLLABORATION OPPORTUNITIES:\n\n${posts.map((post, index) => 
+          `${index + 1}. **${post.brand_name}** - ${post.category}
+   - Description: ${post.description}
+   - Compensation: ${post.compensation}
+   - Target Audience: ${post.target_audience}
+   - Target Age: ${post.target_age_range}
+   - Target Gender: ${post.target_gender}
+   - Campaign Brief: ${post.campaign_brief}
+   - Post ID: ${post.id}
+   - View Link: https://3973aeea-a86d-4604-afb3-4a69ac05edd9.lovableproject.com/discover
+`).join('\n')}\n\nWhen creators ask about specific brands or opportunities, search through these listings and provide relevant matches. Always include the "View Link" so they can see the full details and apply.`
+      : "\n\nCurrently, there are no active brand collaboration opportunities available. Check back soon!";
+
+    const systemPrompt = `You are CollabBot, an AI manager for content creators on VibeLink. Your role is to help creators discover paid collaboration opportunities and manage their partnerships efficiently.${postsContext}
 
 Your key responsibilities:
 1. **Read creator bios and expertise**: Understand the creator's niche, audience, content style, and collaboration interests
