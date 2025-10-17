@@ -1,73 +1,91 @@
-# Welcome to your Lovable project
+<p align="center">
+  <picture>
+    <source srcset="assets/vibelink-logo@2x.png 2x, assets/vibelink-logo.png 1x" />
+    <img src="assets/vibelink-logo.png" alt="VibeLink logo" width="560">
+  </picture>
+</p>
 
-## Project info
+<h1 align="center">VibeLink — Turn your infulence into meaningful partnerships</h1>
 
-**URL**: https://lovable.dev/projects/3973aeea-a86d-4604-afb3-4a69ac05edd9
+<p align="center">
+  <em>A platform to effectively connect small scale creators with brands.</em>
+</p>
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+**VibeLink** bridges brands and creators using two personal AI agents:
 
-**Use Lovable**
+- **CollabBot (for Creators)** — monitors new collaboration listings in real-time, matches to creator preferences/metrics, drafts personalized pitches in the creator’s tone, supports an approval toggle before sending, and learns from response rates to improve outreach style.
+- **BrandScout (for Brands)** — continuously scans for trending/values-aligned creators, produces a ranked shortlist with explainability/fairness, and **simulates campaign outcomes** (reach/engagement/ROI) from historical data.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/3973aeea-a86d-4604-afb3-4a69ac05edd9) and start prompting.
+Built to be **more than a landing page**: it includes real matching, pitch generation, shortlist generation, a basic outcome simulator, and response tracking hooks.
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 🚀 The Problem & The Opportunity
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+The creator economy is booming, yet brands and creators still struggle to connect authentically.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 🔴 The Problem
+- **Misaligned partnerships:** Brands often miss influencers with small influnce reach.
+- **Underserved creators:** Small creators (1k–50k followers) make up 67% out of the total creators.
 
-Follow these steps:
+### 🟢 The Opportunity
+- A clear market need for **values-first, authenticity-driven** matching.
+- The creator market is rapidly expanding, making efficient, ethical matching increasingly valuable.
+- 67% of creators are small scale creators have between 1,000 and 10,000 followers.
+- The market is expected to double in 2027 (Building opportunities) 
+- Source: Goldman Sachs & Linktree.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Novelty of solution
+ - Our solution is highly novel and creative because it reimagines the influencer-brand ecosystem by using AI-based matchmaking to connect creators and brands in a transparent, two-way model. Unlike traditional platforms where brands initiate collaborations, VibeLink empowers creators to discover and apply for brand campaigns that genuinely align with their niche, content style, and audience.
+ - The core innovation lies in our LLM-powered recommendation engine, which analyzes creator bios, skills, and audience demographics to suggest the most relevant campaigns automatically. This approach personalizes collaboration discovery, saves time for both sides, and ensures authentic brand–creator partnerships.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Venture Feasibility
+ - Our idea is highly feasible as a business venture because it addresses a real and growing gap for budding creators and small businesses. Many emerging creators struggle to get noticed by brands, while small businesses often can’t afford large-scale influencer marketing campaigns. VibeLink bridges this gap by creating an accessible, AI-powered space where both sides can find authentic, affordable collaborations that align with their goals and budgets.
+ - By using LLM-based matchmaking, we reduce marketing costs and effort for small brands while helping creators turn their passions into income. The platform’s low-barrier model and mutual value creation make it both socially impactful and sustainable as a venture.
 
-# Step 3: Install the necessary dependencies.
-npm i
+---
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+## 💡 Our Solution: VibeLink
 
-**Edit a file directly in GitHub**
+VibeLink connects brands with creators based on shared values, intrested target niche demographic, and outcome likelihood — not just raw follower counts.
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🔑 Core Features
 
-**Use GitHub Codespaces**
+### For Creators — **CollabBot**
+- **Realtime monitoring** of new collaboration listings from brands.
+- **Preference & metric matching** (Niche, Tone, Geographics, Budget, min rate).
+- **Auto-apply with approval** (human-in-the-loop by default).
+- **Personalized pitches** in your voice (templates + examples).
+- **Video Bio** a 45 second pitch to brands about the content creators.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### For Brands — **BrandScout**
+- **Continuous scanning** for aligned creators (brief → ranked shortlist).
+- **Shortlist deck generation** (HTML→PDF) with trageted creators, key metrics, and “why picked.”
+- **Outcome simulator**: estimates reach/engagement/ROI with uncertainty bands; scenario toggles (budget, #creators).
+- **Fairness + explainability**: diversity constraints and “why this recommendation.”
+---
 
-## What technologies are used for this project?
+## 🗺️ User Journeys
 
-This project is built with:
+### 🎤 Creators (1k–10k followers)
+1. **Register** → set preferences, tone, and approval toggle.
+2. **See matches** → review AI-drafted pitch → tweak tone → approve → sent.
+3. **Track responses** → the agent adapts subject lines/hooks over time.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### 👔 Brands (seeking authentic partnerships)
+1. **Create campaign brief** → goals, budget, values, impact tags.
+2. **Review shortlist** with explainability and fairness snapshot.
+3. **Generate deck** → download PDF, simulate outcomes, and proceed to outreach.
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/3973aeea-a86d-4604-afb3-4a69ac05edd9) and click on Share -> Publish.
+## 🧠 Good Vibes to the Society
 
-## Can I connect a custom domain to my Lovable project?
+**Generate oppurtunities for the Small Scale and Medium Scale creators. **
+**Will make the small scale influencers more interested to return and create more good vibes content for our Los Angels community. **
 
-Yes, you can!
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
