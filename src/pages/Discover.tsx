@@ -46,11 +46,32 @@ const Discover = () => {
     fetchBrands();
   }, []);
 
-  const handleSwipe = (brandId: string, liked: boolean) => {
+  const handleSwipe = async (brandId: string, liked: boolean) => {
     if (liked) {
-      toast.success("Match! CollabBot will reach out to schedule a meeting.", {
-        description: "Check your dashboard for updates.",
-      });
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          // Save application to database
+          const { error } = await supabase
+            .from('applications')
+            .insert({
+              creator_id: user.id,
+              post_id: brandId,
+              status: 'pending'
+            });
+
+          if (error) {
+            console.error('Error saving application:', error);
+          } else {
+            toast.success("Match! CollabBot will reach out to schedule a meeting.", {
+              description: "Check your dashboard for updates.",
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error in handleSwipe:', error);
+      }
     }
     
     setCurrentIndex(prev => prev + 1);

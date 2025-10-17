@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      applications: {
+        Row: {
+          created_at: string
+          creator_id: string
+          id: string
+          post_id: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          id?: string
+          post_id: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          id?: string
+          post_id?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "collaboration_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       collaboration_posts: {
         Row: {
           brand_name: string

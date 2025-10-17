@@ -14,6 +14,7 @@ interface CollaborationPost {
   compensation: string;
   target_audience: string;
   created_at: string;
+  applicant_count?: number;
 }
 
 export default function BrandDashboard() {
@@ -21,6 +22,7 @@ export default function BrandDashboard() {
   const { toast } = useToast();
   const [posts, setPosts] = useState<CollaborationPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [totalApplicants, setTotalApplicants] = useState(0);
 
   useEffect(() => {
     fetchPosts();
@@ -43,7 +45,28 @@ export default function BrandDashboard() {
 
       if (error) throw error;
 
-      setPosts(data || []);
+      // Fetch applicant counts for each post
+      if (data) {
+        const postsWithCounts = await Promise.all(
+          data.map(async (post) => {
+            const { count } = await supabase
+              .from("applications")
+              .select("*", { count: "exact", head: true })
+              .eq("post_id", post.id);
+            
+            return {
+              ...post,
+              applicant_count: count || 0,
+            };
+          })
+        );
+
+        setPosts(postsWithCounts);
+        
+        // Calculate total applicants
+        const total = postsWithCounts.reduce((sum, post) => sum + (post.applicant_count || 0), 0);
+        setTotalApplicants(total);
+      }
     } catch (error: any) {
       toast({
         title: "Error",
@@ -91,7 +114,7 @@ export default function BrandDashboard() {
               <Users className="w-6 h-6 text-white" />
             </div>
             <h3 className="text-xl font-semibold">Applicants</h3>
-            <p className="text-3xl font-bold">0</p>
+            <p className="text-3xl font-bold">{totalApplicants}</p>
           </Card>
 
           <Card className="p-6 space-y-4">
@@ -140,9 +163,13 @@ export default function BrandDashboard() {
                     </div>
                   </div>
                   <p className="text-muted-foreground mb-4">{post.description}</p>
-                  <div className="flex gap-4 text-sm">
+                  <div className="flex gap-4 text-sm items-center">
                     <span className="text-primary font-semibold">{post.compensation}</span>
                     <span className="text-muted-foreground">{post.target_audience}</span>
+                    <span className="ml-auto flex items-center gap-2 text-muted-foreground">
+                      <Users className="w-4 h-4" />
+                      {post.applicant_count || 0} Applicant{post.applicant_count !== 1 ? 's' : ''}
+                    </span>
                   </div>
                 </Card>
               ))}
