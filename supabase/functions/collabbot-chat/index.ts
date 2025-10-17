@@ -21,8 +21,36 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Fetch available collaboration posts
+    // Get user ID from auth header
+    const authHeader = req.headers.get("authorization");
+    const token = authHeader?.replace("Bearer ", "");
+    
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
+    
+    // Verify token and get user
+    let userId: string | null = null;
+    let creatorProfile: any = null;
+    
+    if (token) {
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+      if (!authError && user) {
+        userId = user.id;
+        
+        // Fetch creator profile
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("skills, age, gender, postal_code, content_style, user_type")
+          .eq("id", userId)
+          .single();
+        
+        if (!profileError && profile) {
+          creatorProfile = profile;
+          console.log("Loaded creator profile:", creatorProfile);
+        }
+      }
+    }
+
+    // Fetch available collaboration posts
     const { data: posts, error: postsError } = await supabase
       .from("collaboration_posts")
       .select("*")
@@ -33,22 +61,75 @@ serve(async (req) => {
       console.error("Error fetching posts:", postsError);
     }
 
+    // Format creator profile context
+    const profileContext = creatorProfile 
+      ? `\n\n## CREATOR PROFILE DATA (Use this to match opportunities automatically):\n
+- Skills/Niche: ${creatorProfile.skills || "Not specified"}
+- Age: ${creatorProfile.age || "Not specified"}
+- Gender: ${creatorProfile.gender || "Not specified"}
+- Location (Postal Code): ${creatorProfile.postal_code || "Not specified"}
+- Content Style: ${creatorProfile.content_style || "Not specified"}
+
+**IMPORTANT**: You have access to this creator's profile data. DO NOT ask them to provide their skills, demographics, or content style again. Use this data to automatically suggest relevant brand collaborations that match their profile.`
+      : "\n\n## CREATOR PROFILE: Profile data not available. You may ask basic questions if needed.";
+
     // Format posts for AI context
     const postsContext = posts && posts.length > 0 
-      ? `\n\n## AVAILABLE BRAND COLLABORATION OPPORTUNITIES:\n\n${posts.map((post, index) => 
-          `${index + 1}. **${post.brand_name}** - ${post.category}
+      ? `\n\n## AVAILABLE BRAND COLLABORATION OPPORTUNITIES:\n\n${posts.map((post, index) => {
+          // Calculate match score if we have creator profile
+          let matchInfo = "";
+          if (creatorProfile) {
+            const matchReasons = [];
+            
+            // Age matching
+            const ageRanges: { [key: string]: [number, number] } = {
+              "18-24": [18, 24],
+              "25-34": [25, 34],
+              "35-44": [35, 44],
+              "45+": [45, 100],
+            };
+            const range = ageRanges[post.target_age_range];
+            if (range && creatorProfile.age >= range[0] && creatorProfile.age <= range[1]) {
+              matchReasons.push("Age matches target");
+            }
+            
+            // Gender matching
+            if (post.target_gender.toLowerCase() === "any" || 
+                creatorProfile.gender?.toLowerCase() === post.target_gender.toLowerCase()) {
+              matchReasons.push("Gender matches target");
+            }
+            
+            // Skills/Category matching
+            if (creatorProfile.skills && post.category) {
+              const skills = creatorProfile.skills.toLowerCase();
+              const category = post.category.toLowerCase();
+              if (skills.includes(category) || category.includes(skills)) {
+                matchReasons.push("Skills align with category");
+              }
+            }
+            
+            if (matchReasons.length > 0) {
+              matchInfo = `\n   - 🎯 MATCH REASONS: ${matchReasons.join(", ")}`;
+            }
+          }
+          
+          return `${index + 1}. **${post.brand_name}** - ${post.category}
    - Description: ${post.description}
    - Compensation: ${post.compensation}
    - Target Audience: ${post.target_audience}
    - Target Age: ${post.target_age_range}
    - Target Gender: ${post.target_gender}
-   - Campaign Brief: ${post.campaign_brief}
+   - Campaign Brief: ${post.campaign_brief}${matchInfo}
    - Post ID: ${post.id}
-   - View Link: https://3973aeea-a86d-4604-afb3-4a69ac05edd9.lovableproject.com/discover
-`).join('\n')}\n\nWhen creators ask about specific brands or opportunities, search through these listings and provide relevant matches. Always include the "View Link" so they can see the full details and apply.`
+   - View Link: https://3973aeea-a86d-4604-afb3-4a69ac05edd9.lovableproject.com/discover`;
+        }).join('\n\n')}\n\n**MATCHING INSTRUCTIONS**: 
+- Automatically analyze these opportunities against the creator's profile
+- Proactively suggest the best matches without waiting to be asked
+- Explain WHY each opportunity is a good fit based on their skills, demographics, and content style
+- Always include the "View Link" for opportunities you recommend`
       : "\n\nCurrently, there are no active brand collaboration opportunities available. Check back soon!";
 
-    const systemPrompt = `You are CollabBot, an AI manager for content creators on VibeLink. Your role is to help creators discover paid collaboration opportunities and manage their partnerships efficiently.${postsContext}
+    const systemPrompt = `You are CollabBot, an AI manager for content creators on VibeLink. Your role is to help creators discover paid collaboration opportunities and manage their partnerships efficiently.${profileContext}${postsContext}
 
 Your key responsibilities:
 1. **Read creator bios and expertise**: Understand the creator's niche, audience, content style, and collaboration interests
