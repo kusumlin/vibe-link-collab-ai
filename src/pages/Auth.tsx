@@ -26,13 +26,31 @@ export default function Auth() {
 
     try {
       if (authMode === "signup") {
+        // Collect all form data for metadata
+        const metadata: any = {
+          user_type: userType,
+        };
+
+        // Add creator-specific fields
+        if (userType === "creator") {
+          metadata.skills = formData.get("skills") as string;
+          metadata.age = formData.get("age") as string;
+          metadata.gender = formData.get("gender") as string;
+          metadata.postalCode = formData.get("postalCode") as string;
+          metadata.contentStyle = formData.get("contentStyle") as string;
+        }
+
+        // Add brand-specific fields
+        if (userType === "brand") {
+          metadata.brandDescription = formData.get("brandDescription") as string;
+        }
+
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: {
-              user_type: userType,
-            },
+            emailRedirectTo: `${window.location.origin}/`,
+            data: metadata,
           },
         });
 

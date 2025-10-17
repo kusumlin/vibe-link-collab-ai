@@ -64,21 +64,39 @@ export type Database = {
       }
       profiles: {
         Row: {
+          age: number | null
+          brand_description: string | null
+          content_style: string | null
           created_at: string | null
           email: string | null
+          gender: string | null
           id: string
+          postal_code: string | null
+          skills: string | null
           user_type: string | null
         }
         Insert: {
+          age?: number | null
+          brand_description?: string | null
+          content_style?: string | null
           created_at?: string | null
           email?: string | null
+          gender?: string | null
           id: string
+          postal_code?: string | null
+          skills?: string | null
           user_type?: string | null
         }
         Update: {
+          age?: number | null
+          brand_description?: string | null
+          content_style?: string | null
           created_at?: string | null
           email?: string | null
+          gender?: string | null
           id?: string
+          postal_code?: string | null
+          skills?: string | null
           user_type?: string | null
         }
         Relationships: []
