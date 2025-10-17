@@ -4,20 +4,13 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import heroSunset from "@/assets/hero-sunset.jpg";
 import { DemoVideo } from "./DemoVideo";
-
 export const Hero = () => {
   const navigate = useNavigate();
   const [showDemo, setShowDemo] = useState(false);
-
-  return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+  return <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
-        <img 
-          src={heroSunset} 
-          alt="LA Sunset" 
-          className="w-full h-full object-cover"
-        />
+        <img src={heroSunset} alt="LA Sunset" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background/90" />
       </div>
 
@@ -46,20 +39,11 @@ export const Hero = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-            <Button 
-              variant="gradient" 
-              size="xl" 
-              className="group"
-              onClick={() => navigate('/auth')}
-            >
+            <Button variant="gradient" size="xl" className="group" onClick={() => navigate('/auth')}>
               Get Started Free
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button 
-              variant="outline" 
-              size="xl"
-              onClick={() => setShowDemo(true)}
-            >
+            <Button variant="outline" size="xl" onClick={() => setShowDemo(true)}>
               Watch Demo
             </Button>
           </div>
@@ -67,20 +51,7 @@ export const Hero = () => {
           <DemoVideo open={showDemo} onOpenChange={setShowDemo} />
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-8 pt-12 max-w-2xl mx-auto">
-            <div className="space-y-1">
-              <div className="text-3xl md:text-4xl font-bold gradient-pink text-gradient">10K+</div>
-              <div className="text-sm text-muted-foreground">Creators</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-3xl md:text-4xl font-bold gradient-purple text-gradient">500+</div>
-              <div className="text-sm text-muted-foreground">Brands</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-3xl md:text-4xl font-bold gradient-sunset text-gradient">$2M+</div>
-              <div className="text-sm text-muted-foreground">Paid Out</div>
-            </div>
-          </div>
+          
         </div>
       </div>
 
@@ -90,6 +61,5 @@ export const Hero = () => {
           <div className="w-1.5 h-3 rounded-full bg-primary animate-pulse" />
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
